@@ -2,6 +2,7 @@
 
 package com.tripplanner.android
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -40,6 +41,10 @@ import com.tripplanner.android.ui.screen.ThemeCatalogScreen
 import com.tripplanner.android.ui.theme.TripPlannerTheme
 
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(com.tripplanner.android.core.i18n.LocaleManager.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()

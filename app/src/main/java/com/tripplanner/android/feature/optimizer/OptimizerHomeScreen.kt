@@ -32,9 +32,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Sailing
 import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -51,12 +54,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tripplanner.android.R
 import com.tripplanner.android.core.holidays.CountryCode
+import com.tripplanner.android.core.i18n.AppLanguage
+import com.tripplanner.android.core.i18n.LocaleManager
 import com.tripplanner.android.feature.trips.DestinationDialog
 import com.tripplanner.android.ui.components.SegmentedControl
 import com.tripplanner.android.ui.components.Stepper
@@ -92,23 +100,24 @@ fun OptimizerHomeScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Leave Optimizer ${state.year}", style = MaterialTheme.typography.titleLarge)
+                        Text(stringResource(R.string.optimizer_title, state.year), style = MaterialTheme.typography.titleLarge)
                         Text(
-                            "${state.leaveRemaining} of ${state.annualLeave} leave days left",
+                            stringResource(R.string.optimizer_leave_summary, state.leaveRemaining, state.annualLeave),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 },
                 actions = {
+                    LanguageMenu()
                     IconButton(onClick = onOpenTimeline) {
-                        Icon(Icons.Default.Timeline, contentDescription = "Timeline")
+                        Icon(Icons.Default.Timeline, contentDescription = stringResource(R.string.action_timeline))
                     }
                     IconButton(onClick = onOpenCalendar) {
-                        Icon(Icons.Default.CalendarMonth, contentDescription = "Year calendar")
+                        Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.action_year_calendar))
                     }
                     IconButton(onClick = onOpenCatalog) {
-                        Icon(Icons.Default.Palette, contentDescription = "Design catalog")
+                        Icon(Icons.Default.Palette, contentDescription = stringResource(R.string.action_design_catalog))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -142,7 +151,7 @@ fun OptimizerHomeScreen(
             // ── Suggestions ──────────────────────────────────────────────────────────────
             item {
                 Text(
-                    "Smart suggestions",
+                    stringResource(R.string.smart_suggestions),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(top = 4.dp),
                 )
@@ -179,7 +188,7 @@ fun OptimizerHomeScreen(
             if (state.trips.isNotEmpty()) {
                 item {
                     Text(
-                        "Your trips",
+                        stringResource(R.string.your_trips),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(top = 8.dp),
                     )
@@ -212,6 +221,38 @@ fun OptimizerHomeScreen(
             },
             onDismiss = { pendingSuggestion = null },
         )
+    }
+}
+
+/** Language picker in the top bar: switches the per-app locale and recreates. */
+@Composable
+private fun LanguageMenu() {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+    val current = remember { LocaleManager.getLanguage(context) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(Icons.Default.Language, contentDescription = stringResource(R.string.action_language))
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            AppLanguage.entries.forEach { language ->
+                val labelRes = when (language) {
+                    AppLanguage.English -> R.string.language_english
+                    AppLanguage.Indonesian -> R.string.language_indonesian
+                }
+                DropdownMenuItem(
+                    text = { Text(stringResource(labelRes)) },
+                    onClick = {
+                        expanded = false
+                        if (language != current) {
+                            LocaleManager.setLanguage(context, language)
+                            (context as? android.app.Activity)?.recreate()
+                        }
+                    },
+                )
+            }
+        }
     }
 }
 
@@ -256,7 +297,7 @@ private fun ControlsCard(
 ) {
     TripCard(modifier = Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            LabeledControl("Country") {
+            LabeledControl(stringResource(R.string.label_country)) {
                 val countries = state.supportedCountries
                 SegmentedControl(
                     options = countries.map { it.label },
@@ -265,7 +306,7 @@ private fun ControlsCard(
                 )
             }
 
-            LabeledControl("Year") {
+            LabeledControl(stringResource(R.string.label_year)) {
                 SegmentedControl(
                     options = state.availableYears.map { it.toString() },
                     selectedIndex = state.availableYears.indexOf(state.year).coerceAtLeast(0),
@@ -273,17 +314,18 @@ private fun ControlsCard(
                 )
             }
 
+            val unitDays = stringResource(R.string.unit_days)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Annual leave", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.label_annual_leave), style = MaterialTheme.typography.labelLarge)
                 Stepper(
                     value = state.annualLeave,
                     onValueChange = onAnnualLeave,
                     range = 0..60,
-                    suffix = "days",
+                    suffix = unitDays,
                 )
             }
 
@@ -292,12 +334,12 @@ private fun ControlsCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text("Trip length", style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.label_trip_length), style = MaterialTheme.typography.labelLarge)
                 Stepper(
                     value = state.tripDays,
                     onValueChange = onTripDays,
                     range = 1..30,
-                    suffix = "days",
+                    suffix = unitDays,
                 )
             }
         }
@@ -333,7 +375,7 @@ private fun SuggestionCard(suggestion: TripSuggestion, onAdd: () -> Unit) {
                 )
             }
             TripBadge(
-                "Saves ${suggestion.savedDays}",
+                stringResource(R.string.saves_days, suggestion.savedDays),
                 variant = TripBadgeVariant.Success,
             )
         }
@@ -341,9 +383,9 @@ private fun SuggestionCard(suggestion: TripSuggestion, onAdd: () -> Unit) {
         Spacer(Modifier.height(12.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-            Metric(value = "${suggestion.daysOff}", label = "days off")
-            Metric(value = "${suggestion.leaveDaysNeeded}", label = "leave spent")
-            Metric(value = String.format(Locale.ENGLISH, "%.1f×", suggestion.efficiency), label = "efficiency")
+            Metric(value = "${suggestion.daysOff}", label = stringResource(R.string.metric_days_off))
+            Metric(value = "${suggestion.leaveDaysNeeded}", label = stringResource(R.string.metric_leave_spent))
+            Metric(value = String.format(Locale.ENGLISH, "%.1f×", suggestion.efficiency), label = stringResource(R.string.metric_efficiency))
         }
 
         if (suggestion.nearHolidays.isNotEmpty()) {
@@ -357,7 +399,7 @@ private fun SuggestionCard(suggestion: TripSuggestion, onAdd: () -> Unit) {
 
         Spacer(Modifier.height(12.dp))
         TripButton(onClick = onAdd, modifier = Modifier.fillMaxWidth()) {
-            Text("Add as trip")
+            Text(stringResource(R.string.add_as_trip))
         }
     }
 }
@@ -416,7 +458,7 @@ private fun PlannedTripRow(
                 )
             }
             IconButton(onClick = onRemove) {
-                Icon(Icons.Default.Close, contentDescription = "Remove trip")
+                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.remove_trip))
             }
         }
     }
@@ -437,12 +479,12 @@ private fun EmptySuggestions() {
                 modifier = Modifier.size(32.dp),
             )
             Text(
-                "No efficient windows for this trip length.",
+                stringResource(R.string.empty_no_windows),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
-                "Try a different trip length or year.",
+                stringResource(R.string.empty_try_different),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
