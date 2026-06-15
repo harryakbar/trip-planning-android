@@ -34,6 +34,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Sailing
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -77,6 +78,7 @@ private val dateFmt: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM d", Lo
 fun OptimizerHomeScreen(
     onOpenCatalog: () -> Unit = {},
     onOpenCalendar: () -> Unit = {},
+    onOpenTimeline: () -> Unit = {},
     onTripClick: (PlannedTrip) -> Unit = {},
     viewModel: OptimizerViewModel = viewModel(),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -99,6 +101,9 @@ fun OptimizerHomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onOpenTimeline) {
+                        Icon(Icons.Default.Timeline, contentDescription = "Timeline")
+                    }
                     IconButton(onClick = onOpenCalendar) {
                         Icon(Icons.Default.CalendarMonth, contentDescription = "Year calendar")
                     }
