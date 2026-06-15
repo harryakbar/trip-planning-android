@@ -28,6 +28,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tripplanner.android.core.holidays.CountryCode
 import com.tripplanner.android.feature.calendar.YearCalendarScreen
+import com.tripplanner.android.feature.itinerary.ActivityStoriesScreen
 import com.tripplanner.android.feature.itinerary.Currency
 import com.tripplanner.android.feature.itinerary.ItineraryViewerScreen
 import com.tripplanner.android.feature.optimizer.OptimizerHomeScreen
@@ -62,6 +63,7 @@ private sealed class Screen {
     data object Catalog : Screen()
     data class TripDetail(val trip: PlannedTrip) : Screen()
     data class Itinerary(val trip: PlannedTrip) : Screen()
+    data class Stories(val trip: PlannedTrip, val startIndex: Int) : Screen()
 }
 
 @Composable
@@ -121,6 +123,15 @@ fun AppRoot() {
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this@AnimatedContent,
                     onBack = { screen = Screen.TripDetail(target.trip) },
+                    onActivityClick = { startIndex -> screen = Screen.Stories(target.trip, startIndex) },
+                )
+                is Screen.Stories -> ActivityStoriesScreen(
+                    trip = target.trip,
+                    currency = currency,
+                    startIndex = target.startIndex,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedContentScope = this@AnimatedContent,
+                    onClose = { screen = Screen.Itinerary(target.trip) },
                 )
             }
         }
