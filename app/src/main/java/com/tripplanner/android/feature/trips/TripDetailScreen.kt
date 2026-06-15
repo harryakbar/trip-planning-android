@@ -54,6 +54,7 @@ fun TripDetailScreen(
     onBack: () -> Unit,
     onDelete: () -> Unit,
     onSaveNotes: (String) -> Unit = {},
+    onGenerateItinerary: () -> Unit = {},
 ) {
     var notes by remember(trip.id) { mutableStateOf(trip.notes) }
 
@@ -163,16 +164,15 @@ fun TripDetailScreen(
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Itinerary", style = MaterialTheme.typography.titleSmall)
                     Text(
-                        "AI-generated day-by-day plan — coming soon.",
+                        "Preview a day-by-day plan with activities and a budget breakdown.",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     TripButton(
-                        onClick = {},
-                        enabled = false,
+                        onClick = onGenerateItinerary,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Generate itinerary")
+                        Text("View itinerary")
                     }
                 }
             }
