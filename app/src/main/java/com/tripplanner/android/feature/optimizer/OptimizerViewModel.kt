@@ -31,11 +31,6 @@ data class OptimizerUiState(
     val supportedCountries: List<CountryCode> get() = HolidayRepository.getSupportedCountries()
 }
 
-/**
- * Drives the optimizer home screen. Holds country / year / annual-leave / trip-day
- * selections and recomputes engine suggestions whenever inputs change. Mirrors the
- * web `tripStore` (Zustand) state shape, minus the deferred group/cloud concerns.
- */
 class OptimizerViewModel : ViewModel() {
 
     private val _state = MutableStateFlow(initialState())
@@ -103,10 +98,12 @@ class OptimizerViewModel : ViewModel() {
         _state.update { s -> s.copy(trips = s.trips.filterNot { it.id == id }) }
     }
 
-    /**
-     * Adds a trip from an arbitrary date range (e.g. a calendar selection),
-     * computing the leave days it costs from the current year's holidays.
-     */
+    fun updateTripNotes(id: Long, notes: String) {
+        _state.update { s ->
+            s.copy(trips = s.trips.map { if (it.id == id) it.copy(notes = notes) else it })
+        }
+    }
+
     fun addTripFromRange(start: LocalDate, end: LocalDate, destination: String) {
         if (end.isBefore(start)) return
         val snapshot = _state.value
@@ -138,7 +135,6 @@ class OptimizerViewModel : ViewModel() {
                 holidays to OptimizerEngine.pickTopSuggestions(scores, snapshot.tripDays)
             }
             val (holidays, suggestions) = result
-            // Only apply if inputs haven't changed since this computation started.
             _state.update {
                 if (it.country == snapshot.country && it.year == snapshot.year &&
                     it.tripDays == snapshot.tripDays

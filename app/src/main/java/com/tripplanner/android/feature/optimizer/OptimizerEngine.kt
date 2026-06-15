@@ -11,6 +11,7 @@ data class PlannedTrip(
     val startDate: LocalDate,
     val tripDays: Int,
     val leaveDaysNeeded: Int,
+    val notes: String = "",
 ) {
     val endDate: LocalDate get() = startDate.plusDays((tripDays - 1).toLong())
 }
