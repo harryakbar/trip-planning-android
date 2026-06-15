@@ -59,6 +59,7 @@ import com.tripplanner.android.feature.optimizer.OptimizerUiState
 import com.tripplanner.android.feature.optimizer.OptimizerViewModel
 import com.tripplanner.android.feature.optimizer.PlannedTrip
 import com.tripplanner.android.feature.optimizer.TripSuggestion
+import com.tripplanner.android.feature.trips.DestinationDialog
 import com.tripplanner.android.ui.components.TripButton
 import com.tripplanner.android.ui.components.TripTextButton
 import com.tripplanner.android.ui.theme.Chart1
@@ -89,6 +90,7 @@ fun YearCalendarScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var selStart by remember { mutableStateOf<LocalDate?>(null) }
     var selEnd by remember { mutableStateOf<LocalDate?>(null) }
+    var showDestDialog by remember { mutableStateOf(false) }
 
     // Clear an out-of-year selection when the year changes.
     LaunchedEffect(state.year) { selStart = null; selEnd = null }
@@ -170,12 +172,22 @@ fun YearCalendarScreen(
                         start = start,
                         end = end,
                         onClear = { selStart = null; selEnd = null },
-                        onCreate = {
-                            viewModel.addTripFromRange(start, end, destination = "")
-                            selStart = null; selEnd = null
-                        },
+                        onCreate = { showDestDialog = true },
                     )
                 }
+            }
+
+            // Destination dialog shown after tapping "Create trip".
+            if (showDestDialog && start != null && end != null) {
+                DestinationDialog(
+                    onConfirm = { destination ->
+                        viewModel.addTripFromRange(start, end, destination = destination)
+                        showDestDialog = false
+                        selStart = null
+                        selEnd = null
+                    },
+                    onDismiss = { showDestDialog = false },
+                )
             }
         }
     }
