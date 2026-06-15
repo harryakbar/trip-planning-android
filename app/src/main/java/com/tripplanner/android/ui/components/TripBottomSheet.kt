@@ -36,7 +36,6 @@ fun TripBottomSheet(
         ),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        windowInsets = WindowInsets(0),
     ) {
         content()
         androidx.compose.foundation.layout.Spacer(

@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.tripplanner.android.ui.components.CategoryStyle
 import com.tripplanner.android.ui.components.SegmentedControl
 import com.tripplanner.android.ui.components.TripBadge
 import com.tripplanner.android.ui.components.TripBadgeVariant
