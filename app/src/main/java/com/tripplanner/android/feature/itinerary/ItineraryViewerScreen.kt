@@ -67,6 +67,7 @@ fun ItineraryViewerScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     onBack: () -> Unit,
+    onActivityClick: (Int) -> Unit = {},
 ) {
     val itinerary = remember(trip.id, currency) { SampleItinerary.forTrip(trip, currency) }
     val pagerState = rememberPagerState(pageCount = { itinerary.days.size })
@@ -123,7 +124,14 @@ fun ItineraryViewerScreen(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
             ) { page ->
-                DayPage(day = itinerary.days[page], currency = currency)
+                DayPage(
+                    itinerary = itinerary,
+                    day = itinerary.days[page],
+                    currency = currency,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    onActivityClick = onActivityClick,
+                )
             }
         }
     }
@@ -160,7 +168,14 @@ private fun OverviewCard(itinerary: Itinerary) {
 }
 
 @Composable
-private fun DayPage(day: ItineraryDay, currency: Currency) {
+private fun DayPage(
+    itinerary: Itinerary,
+    day: ItineraryDay,
+    currency: Currency,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    onActivityClick: (Int) -> Unit,
+) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
@@ -182,15 +197,36 @@ private fun DayPage(day: ItineraryDay, currency: Currency) {
         }
         itemsIndexed(day.activities, key = { _, a -> a.id }) { index, activity ->
             StaggeredReveal(index = index) {
-                ActivityCard(activity = activity, currency = currency)
+                ActivityCard(
+                    activity = activity,
+                    currency = currency,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    onClick = { onActivityClick(storyIndexOf(itinerary, activity.id)) },
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ActivityCard(activity: ActivityItem, currency: Currency) {
-    TripCard(modifier = Modifier.fillMaxWidth()) {
+private fun ActivityCard(
+    activity: ActivityItem,
+    currency: Currency,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    onClick: () -> Unit,
+) {
+    val cardModifier = with(sharedTransitionScope) {
+        Modifier
+            .fillMaxWidth()
+            .sharedBounds(
+                sharedContentState = rememberSharedContentState(key = "activity-${activity.id}"),
+                animatedVisibilityScope = animatedContentScope,
+                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+            )
+    }
+    TripCard(onClick = onClick, modifier = cardModifier) {
         Row(verticalAlignment = Alignment.Top) {
             Box(
                 contentAlignment = Alignment.Center,
