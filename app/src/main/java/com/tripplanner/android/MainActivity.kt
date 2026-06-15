@@ -24,8 +24,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tripplanner.android.core.holidays.CountryCode
 import com.tripplanner.android.feature.calendar.YearCalendarScreen
+import com.tripplanner.android.feature.itinerary.Currency
+import com.tripplanner.android.feature.itinerary.ItineraryViewerScreen
 import com.tripplanner.android.feature.optimizer.OptimizerHomeScreen
 import com.tripplanner.android.feature.optimizer.OptimizerViewModel
 import com.tripplanner.android.feature.optimizer.PlannedTrip
@@ -57,12 +61,15 @@ private sealed class Screen {
     data object Timeline : Screen()
     data object Catalog : Screen()
     data class TripDetail(val trip: PlannedTrip) : Screen()
+    data class Itinerary(val trip: PlannedTrip) : Screen()
 }
 
 @Composable
 fun AppRoot() {
     var screen by remember { mutableStateOf<Screen>(Screen.Optimizer) }
     val sharedViewModel: OptimizerViewModel = viewModel()
+    val state by sharedViewModel.state.collectAsStateWithLifecycle()
+    val currency = if (state.country == CountryCode.ID) Currency.IDR else Currency.SGD
 
     SharedTransitionLayout {
         AnimatedContent(
@@ -106,6 +113,14 @@ fun AppRoot() {
                     onBack = { screen = Screen.Optimizer },
                     onDelete = { sharedViewModel.removeTrip(target.trip.id) },
                     onSaveNotes = { notes -> sharedViewModel.updateTripNotes(target.trip.id, notes) },
+                    onGenerateItinerary = { screen = Screen.Itinerary(target.trip) },
+                )
+                is Screen.Itinerary -> ItineraryViewerScreen(
+                    trip = target.trip,
+                    currency = currency,
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedContentScope = this@AnimatedContent,
+                    onBack = { screen = Screen.TripDetail(target.trip) },
                 )
             }
         }
