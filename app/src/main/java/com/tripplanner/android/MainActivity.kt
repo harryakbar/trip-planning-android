@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.tripplanner.android.feature.calendar.YearCalendarScreen
 import com.tripplanner.android.feature.optimizer.OptimizerHomeScreen
 import com.tripplanner.android.ui.screen.ThemeCatalogScreen
 import com.tripplanner.android.ui.theme.TripPlannerTheme
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-private enum class Screen { Optimizer, Catalog }
+private enum class Screen { Optimizer, Calendar, Catalog }
 
 @Composable
 fun AppRoot() {
@@ -50,7 +51,8 @@ fun AppRoot() {
     AnimatedContent(
         targetState = screen,
         transitionSpec = {
-            val forward = targetState == Screen.Catalog
+            // Optimizer is the root; other screens slide in from the right.
+            val forward = targetState != Screen.Optimizer
             val enter = fadeIn(tween(300)) + slideInHorizontally(tween(300)) {
                 if (forward) it else -it
             }
@@ -62,7 +64,11 @@ fun AppRoot() {
         label = "screen_transition",
     ) { target ->
         when (target) {
-            Screen.Optimizer -> OptimizerHomeScreen(onOpenCatalog = { screen = Screen.Catalog })
+            Screen.Optimizer -> OptimizerHomeScreen(
+                onOpenCatalog = { screen = Screen.Catalog },
+                onOpenCalendar = { screen = Screen.Calendar },
+            )
+            Screen.Calendar -> YearCalendarScreen(onBack = { screen = Screen.Optimizer })
             Screen.Catalog -> ThemeCatalogScreen(onBack = { screen = Screen.Optimizer })
         }
     }
