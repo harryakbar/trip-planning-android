@@ -29,6 +29,7 @@ import com.tripplanner.android.feature.calendar.YearCalendarScreen
 import com.tripplanner.android.feature.optimizer.OptimizerHomeScreen
 import com.tripplanner.android.feature.optimizer.OptimizerViewModel
 import com.tripplanner.android.feature.optimizer.PlannedTrip
+import com.tripplanner.android.feature.timeline.TimelineScreen
 import com.tripplanner.android.feature.trips.TripDetailScreen
 import com.tripplanner.android.ui.screen.ThemeCatalogScreen
 import com.tripplanner.android.ui.theme.TripPlannerTheme
@@ -53,6 +54,7 @@ class MainActivity : ComponentActivity() {
 private sealed class Screen {
     data object Optimizer : Screen()
     data object Calendar : Screen()
+    data object Timeline : Screen()
     data object Catalog : Screen()
     data class TripDetail(val trip: PlannedTrip) : Screen()
 }
@@ -84,11 +86,17 @@ fun AppRoot() {
                     animatedContentScope = this@AnimatedContent,
                     onOpenCatalog = { screen = Screen.Catalog },
                     onOpenCalendar = { screen = Screen.Calendar },
+                    onOpenTimeline = { screen = Screen.Timeline },
                     onTripClick = { trip -> screen = Screen.TripDetail(trip) },
                 )
                 Screen.Calendar -> YearCalendarScreen(
                     viewModel = sharedViewModel,
                     onBack = { screen = Screen.Optimizer },
+                )
+                Screen.Timeline -> TimelineScreen(
+                    viewModel = sharedViewModel,
+                    onBack = { screen = Screen.Optimizer },
+                    onTripClick = { trip -> screen = Screen.TripDetail(trip) },
                 )
                 Screen.Catalog -> ThemeCatalogScreen(onBack = { screen = Screen.Optimizer })
                 is Screen.TripDetail -> TripDetailScreen(
