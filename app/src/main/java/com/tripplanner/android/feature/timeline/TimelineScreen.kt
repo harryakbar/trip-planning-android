@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -244,6 +246,7 @@ private fun TimelineNode(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(IntrinsicSize.Min)
             .then(if (tappable) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(vertical = 6.dp),
     ) {
@@ -252,6 +255,7 @@ private fun TimelineNode(
             contentAlignment = Alignment.TopCenter,
             modifier = Modifier
                 .width(28.dp)
+                .fillMaxHeight()
                 .drawBehind {
                     val cx = size.width / 2f
                     val top = if (isFirst) size.height * 0.5f else 0f
