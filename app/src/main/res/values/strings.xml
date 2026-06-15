@@ -1,3 +1,42 @@
 <resources>
     <string name="app_name">Trip Planner</string>
+
+    <!-- Top bar / actions -->
+    <string name="optimizer_title">Leave Optimizer %1$d</string>
+    <string name="optimizer_leave_summary">%1$d of %2$d leave days left</string>
+    <string name="action_year_calendar">Year calendar</string>
+    <string name="action_timeline">Timeline</string>
+    <string name="action_design_catalog">Design catalog</string>
+    <string name="action_language">Language</string>
+
+    <!-- Suggestions -->
+    <string name="smart_suggestions">Smart suggestions</string>
+    <string name="add_as_trip">Add as trip</string>
+    <string name="saves_days">Saves %1$d</string>
+    <string name="metric_days_off">days off</string>
+    <string name="metric_leave_spent">leave spent</string>
+    <string name="metric_efficiency">efficiency</string>
+    <string name="empty_no_windows">No efficient windows for this trip length.</string>
+    <string name="empty_try_different">Try a different trip length or year.</string>
+
+    <!-- Controls -->
+    <string name="label_country">Country</string>
+    <string name="label_year">Year</string>
+    <string name="label_annual_leave">Annual leave</string>
+    <string name="label_trip_length">Trip length</string>
+    <string name="unit_days">days</string>
+
+    <!-- Trips -->
+    <string name="your_trips">Your trips</string>
+    <string name="remove_trip">Remove trip</string>
+
+    <!-- Name-trip dialog -->
+    <string name="dialog_name_trip_title">Name your trip</string>
+    <string name="dialog_name_trip_placeholder">e.g. Bali, Tokyo…</string>
+    <string name="dialog_add_trip">Add trip</string>
+    <string name="action_cancel">Cancel</string>
+
+    <!-- Language names -->
+    <string name="language_english">English</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
 </resources>

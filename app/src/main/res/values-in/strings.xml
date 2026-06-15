@@ -1,0 +1,40 @@
+<resources>
+    <!-- Top bar / actions -->
+    <string name="optimizer_title">Pengoptimal Cuti %1$d</string>
+    <string name="optimizer_leave_summary">%1$d dari %2$d hari cuti tersisa</string>
+    <string name="action_year_calendar">Kalender tahunan</string>
+    <string name="action_timeline">Linimasa</string>
+    <string name="action_design_catalog">Katalog desain</string>
+    <string name="action_language">Bahasa</string>
+
+    <!-- Suggestions -->
+    <string name="smart_suggestions">Saran cerdas</string>
+    <string name="add_as_trip">Tambahkan sebagai perjalanan</string>
+    <string name="saves_days">Hemat %1$d</string>
+    <string name="metric_days_off">hari libur</string>
+    <string name="metric_leave_spent">cuti terpakai</string>
+    <string name="metric_efficiency">efisiensi</string>
+    <string name="empty_no_windows">Tidak ada periode efisien untuk durasi ini.</string>
+    <string name="empty_try_different">Coba durasi atau tahun yang berbeda.</string>
+
+    <!-- Controls -->
+    <string name="label_country">Negara</string>
+    <string name="label_year">Tahun</string>
+    <string name="label_annual_leave">Cuti tahunan</string>
+    <string name="label_trip_length">Durasi perjalanan</string>
+    <string name="unit_days">hari</string>
+
+    <!-- Trips -->
+    <string name="your_trips">Perjalanan Anda</string>
+    <string name="remove_trip">Hapus perjalanan</string>
+
+    <!-- Name-trip dialog -->
+    <string name="dialog_name_trip_title">Beri nama perjalanan</string>
+    <string name="dialog_name_trip_placeholder">mis. Bali, Tokyo…</string>
+    <string name="dialog_add_trip">Tambah perjalanan</string>
+    <string name="action_cancel">Batal</string>
+
+    <!-- Language names -->
+    <string name="language_english">English</string>
+    <string name="language_indonesian">Bahasa Indonesia</string>
+</resources>
