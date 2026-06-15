@@ -1,15 +1,20 @@
 package com.tripplanner.android.feature.optimizer
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.tripplanner.android.core.holidays.CountryCode
 import com.tripplanner.android.core.holidays.HolidayRepository
 import com.tripplanner.android.core.holidays.ResolvedHoliday
 import com.tripplanner.android.core.optimizer.LeaveOptimization
+import com.tripplanner.android.data.TripRepository
+import com.tripplanner.android.data.local.TripDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,15 +36,26 @@ data class OptimizerUiState(
     val supportedCountries: List<CountryCode> get() = HolidayRepository.getSupportedCountries()
 }
 
-class OptimizerViewModel : ViewModel() {
+/**
+ * Drives the optimizer/calendar/timeline screens. Trips are persisted locally
+ * via [TripRepository] (Room) and observed as a flow, so they survive process
+ * death and app restarts; the rest of the state (country/year/leave/suggestions)
+ * is ephemeral UI state. Cloud sync will extend the repository, not this class.
+ */
+class OptimizerViewModel(app: Application) : AndroidViewModel(app) {
+
+    private val trips: TripRepository =
+        TripRepository(TripDatabase.getInstance(app).tripDao())
 
     private val _state = MutableStateFlow(initialState())
     val state: StateFlow<OptimizerUiState> = _state.asStateFlow()
 
-    private var nextTripId = 1L
-
     init {
         recomputeSuggestions()
+        // Keep UI state's trip list in sync with the persisted source of truth.
+        trips.observeTrips()
+            .onEach { persisted -> _state.update { it.copy(trips = persisted) } }
+            .launchIn(viewModelScope)
     }
 
     private fun initialState(): OptimizerUiState {
@@ -84,24 +100,23 @@ class OptimizerViewModel : ViewModel() {
     }
 
     fun addTrip(suggestion: TripSuggestion, destination: String) {
+        val name = destination.ifBlank { "Trip ${_state.value.trips.size + 1}" }
         val trip = PlannedTrip(
-            id = nextTripId++,
-            destination = destination.ifBlank { "Trip ${_state.value.trips.size + 1}" },
+            id = 0,
+            destination = name,
             startDate = suggestion.startDate,
             tripDays = suggestion.tripDays,
             leaveDaysNeeded = suggestion.leaveDaysNeeded,
         )
-        _state.update { it.copy(trips = it.trips + trip) }
+        viewModelScope.launch { trips.addTrip(trip) }
     }
 
     fun removeTrip(id: Long) {
-        _state.update { s -> s.copy(trips = s.trips.filterNot { it.id == id }) }
+        viewModelScope.launch { trips.removeTrip(id) }
     }
 
     fun updateTripNotes(id: Long, notes: String) {
-        _state.update { s ->
-            s.copy(trips = s.trips.map { if (it.id == id) it.copy(notes = notes) else it })
-        }
+        viewModelScope.launch { trips.updateNotes(id, notes) }
     }
 
     fun addTripFromRange(start: LocalDate, end: LocalDate, destination: String) {
@@ -111,13 +126,13 @@ class OptimizerViewModel : ViewModel() {
         val prefix = LeaveOptimization.buildWorkingDayPrefix(snapshot.year, snapshot.holidays)
         val leave = LeaveOptimization.calculateWorkingDaysNeeded(start, tripDays, prefix)
         val trip = PlannedTrip(
-            id = nextTripId++,
+            id = 0,
             destination = destination.ifBlank { "Trip ${snapshot.trips.size + 1}" },
             startDate = start,
             tripDays = tripDays,
             leaveDaysNeeded = leave,
         )
-        _state.update { it.copy(trips = it.trips + trip) }
+        viewModelScope.launch { trips.addTrip(trip) }
     }
 
     private fun recomputeSuggestions() {
