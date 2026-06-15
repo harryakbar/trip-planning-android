@@ -1,9 +1,13 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.tripplanner.android.feature.optimizer
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -52,8 +56,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.tripplanner.android.core.holidays.CountryCode
+import com.tripplanner.android.feature.trips.DestinationDialog
 import com.tripplanner.android.ui.components.SegmentedControl
 import com.tripplanner.android.ui.components.Stepper
+import com.tripplanner.android.ui.components.SwipeToDeleteContainer
 import com.tripplanner.android.ui.components.TripBadge
 import com.tripplanner.android.ui.components.TripBadgeVariant
 import com.tripplanner.android.ui.components.TripButton
@@ -71,9 +77,13 @@ private val dateFmt: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM d", Lo
 fun OptimizerHomeScreen(
     onOpenCatalog: () -> Unit = {},
     onOpenCalendar: () -> Unit = {},
+    onTripClick: (PlannedTrip) -> Unit = {},
     viewModel: OptimizerViewModel = viewModel(),
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedContentScope? = null,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var pendingSuggestion by remember { mutableStateOf<TripSuggestion?>(null) }
 
     Scaffold(
         topBar = {
@@ -113,7 +123,7 @@ fun OptimizerHomeScreen(
         ) {
             item { Spacer(Modifier.height(0.dp)) }
 
-            // ── Controls ──────────────────────────────────────────────────────
+            // ── Controls ────────────────────────────────────────────────────────────────
             item {
                 ControlsCard(
                     state = state,
@@ -124,7 +134,7 @@ fun OptimizerHomeScreen(
                 )
             }
 
-            // ── Suggestions ───────────────────────────────────────────────────
+            // ── Suggestions ──────────────────────────────────────────────────────────────
             item {
                 Text(
                     "Smart suggestions",
@@ -138,7 +148,6 @@ fun OptimizerHomeScreen(
             } else if (state.suggestions.isEmpty()) {
                 item { EmptySuggestions() }
             } else {
-                // Animate the set as a whole when country/year/tripDays change.
                 item {
                     AnimatedContent(
                         targetState = Triple(state.country, state.year, state.tripDays),
@@ -152,7 +161,7 @@ fun OptimizerHomeScreen(
                                 StaggeredReveal(index = index) {
                                     SuggestionCard(
                                         suggestion = suggestion,
-                                        onAdd = { viewModel.addTrip(suggestion, destination = "") },
+                                        onAdd = { pendingSuggestion = suggestion },
                                     )
                                 }
                             }
@@ -161,7 +170,7 @@ fun OptimizerHomeScreen(
                 }
             }
 
-            // ── Planned trips ─────────────────────────────────────────────────
+            // ── Planned trips ────────────────────────────────────────────────────────────
             if (state.trips.isNotEmpty()) {
                 item {
                     Text(
@@ -171,17 +180,64 @@ fun OptimizerHomeScreen(
                     )
                 }
                 items(state.trips, key = { it.id }) { trip ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + slideInVertically(spring()) { it / 3 },
+                    SwipeToDeleteContainer(
+                        onDelete = { viewModel.removeTrip(trip.id) },
+                        modifier = Modifier.animateItem(),
                     ) {
-                        PlannedTripRow(trip = trip, onRemove = { viewModel.removeTrip(trip.id) })
+                        PlannedTripRow(
+                            trip = trip,
+                            onClick = { onTripClick(trip) },
+                            onRemove = { viewModel.removeTrip(trip.id) },
+                            sharedTransitionScope = sharedTransitionScope,
+                            animatedContentScope = animatedContentScope,
+                        )
                     }
                 }
             }
 
             item { Spacer(Modifier.height(24.dp)) }
         }
+    }
+
+    pendingSuggestion?.let { suggestion ->
+        DestinationDialog(
+            onConfirm = { destination ->
+                viewModel.addTrip(suggestion, destination)
+                pendingSuggestion = null
+            },
+            onDismiss = { pendingSuggestion = null },
+        )
+    }
+}
+
+@Composable
+private fun Modifier.maybeSharedBounds(
+    scope: SharedTransitionScope?,
+    animScope: AnimatedContentScope?,
+    key: Any,
+): Modifier {
+    if (scope == null || animScope == null) return this
+    return with(scope) {
+        this@maybeSharedBounds.sharedBounds(
+            sharedContentState = rememberSharedContentState(key = key),
+            animatedVisibilityScope = animScope,
+            resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+        )
+    }
+}
+
+@Composable
+private fun Modifier.maybeSharedElement(
+    scope: SharedTransitionScope?,
+    animScope: AnimatedContentScope?,
+    key: Any,
+): Modifier {
+    if (scope == null || animScope == null) return this
+    return with(scope) {
+        this@maybeSharedElement.sharedElement(
+            state = rememberSharedContentState(key = key),
+            animatedVisibilityScope = animScope,
+        )
     }
 }
 
@@ -310,8 +366,19 @@ private fun Metric(value: String, label: String) {
 }
 
 @Composable
-private fun PlannedTripRow(trip: PlannedTrip, onRemove: () -> Unit) {
-    TripCard(modifier = Modifier.fillMaxWidth()) {
+private fun PlannedTripRow(
+    trip: PlannedTrip,
+    onClick: () -> Unit,
+    onRemove: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedContentScope: AnimatedContentScope? = null,
+) {
+    TripCard(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .maybeSharedBounds(sharedTransitionScope, animatedContentScope, key = "trip-card-${trip.id}"),
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -330,7 +397,13 @@ private fun PlannedTripRow(trip: PlannedTrip, onRemove: () -> Unit) {
             }
             Spacer(Modifier.size(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(trip.destination, style = MaterialTheme.typography.titleSmall)
+                Text(
+                    trip.destination,
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.maybeSharedElement(
+                        sharedTransitionScope, animatedContentScope, key = "trip-title-${trip.id}",
+                    ),
+                )
                 Text(
                     "${trip.startDate.format(dateFmt)} – ${trip.endDate.format(dateFmt)} · ${trip.leaveDaysNeeded} leave",
                     style = MaterialTheme.typography.bodySmall,
