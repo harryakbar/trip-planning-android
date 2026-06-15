@@ -22,6 +22,7 @@ data class OptimizerUiState(
     val tripDays: Int = 5,
     val availableYears: List<Int> = emptyList(),
     val suggestions: List<TripSuggestion> = emptyList(),
+    val holidays: List<ResolvedHoliday> = emptyList(),
     val trips: List<PlannedTrip> = emptyList(),
     val isLoading: Boolean = true,
 ) {
@@ -102,11 +103,31 @@ class OptimizerViewModel : ViewModel() {
         _state.update { s -> s.copy(trips = s.trips.filterNot { it.id == id }) }
     }
 
+    /**
+     * Adds a trip from an arbitrary date range (e.g. a calendar selection),
+     * computing the leave days it costs from the current year's holidays.
+     */
+    fun addTripFromRange(start: LocalDate, end: LocalDate, destination: String) {
+        if (end.isBefore(start)) return
+        val snapshot = _state.value
+        val tripDays = (java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1).toInt()
+        val prefix = LeaveOptimization.buildWorkingDayPrefix(snapshot.year, snapshot.holidays)
+        val leave = LeaveOptimization.calculateWorkingDaysNeeded(start, tripDays, prefix)
+        val trip = PlannedTrip(
+            id = nextTripId++,
+            destination = destination.ifBlank { "Trip ${snapshot.trips.size + 1}" },
+            startDate = start,
+            tripDays = tripDays,
+            leaveDaysNeeded = leave,
+        )
+        _state.update { it.copy(trips = it.trips + trip) }
+    }
+
     private fun recomputeSuggestions() {
         val snapshot = _state.value
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            val suggestions = withContext(Dispatchers.Default) {
+            val result = withContext(Dispatchers.Default) {
                 val holidays: List<ResolvedHoliday> =
                     HolidayRepository.getHolidaysForYear(snapshot.country, snapshot.year)
                 val scores = LeaveOptimization.calculateOptimizationScores(
@@ -114,14 +135,15 @@ class OptimizerViewModel : ViewModel() {
                     year = snapshot.year,
                     holidays = holidays,
                 )
-                OptimizerEngine.pickTopSuggestions(scores, snapshot.tripDays)
+                holidays to OptimizerEngine.pickTopSuggestions(scores, snapshot.tripDays)
             }
+            val (holidays, suggestions) = result
             // Only apply if inputs haven't changed since this computation started.
             _state.update {
                 if (it.country == snapshot.country && it.year == snapshot.year &&
                     it.tripDays == snapshot.tripDays
                 ) {
-                    it.copy(suggestions = suggestions, isLoading = false)
+                    it.copy(suggestions = suggestions, holidays = holidays, isLoading = false)
                 } else {
                     it
                 }

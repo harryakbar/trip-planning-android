@@ -70,6 +70,7 @@ private val dateFmt: DateTimeFormatter = DateTimeFormatter.ofPattern("MMM d", Lo
 @Composable
 fun OptimizerHomeScreen(
     onOpenCatalog: () -> Unit = {},
+    onOpenCalendar: () -> Unit = {},
     viewModel: OptimizerViewModel = viewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -88,6 +89,9 @@ fun OptimizerHomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onOpenCalendar) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = "Year calendar")
+                    }
                     IconButton(onClick = onOpenCatalog) {
                         Icon(Icons.Default.Palette, contentDescription = "Design catalog")
                     }
