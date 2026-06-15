@@ -54,10 +54,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tripplanner.android.R
 import com.tripplanner.android.feature.optimizer.OptimizerViewModel
 import com.tripplanner.android.feature.optimizer.PlannedTrip
 import com.tripplanner.android.ui.theme.LocalTripColors
@@ -103,10 +105,10 @@ fun TimelineScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("${state.year} Timeline", style = MaterialTheme.typography.titleLarge) },
+                title = { Text(stringResource(R.string.timeline_title, state.year), style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -192,7 +194,7 @@ private fun TodayMarker() {
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            "Today",
+            stringResource(R.string.timeline_today),
             style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.primary,
@@ -305,12 +307,11 @@ private fun TimelineCard(entry: TimelineEntry, accent: Color) {
         when (entry) {
             is TimelineEntry.Holiday -> {
                 Text(entry.holiday.name, style = MaterialTheme.typography.titleSmall)
+                val kind = stringResource(
+                    if (entry.holiday.isCutiBersama) R.string.legend_cuti_bersama else R.string.legend_public_holiday,
+                )
                 Text(
-                    buildString {
-                        append(entry.holiday.date.format(timelineDateFmt))
-                        if (entry.holiday.isCutiBersama) append(" · Cuti Bersama")
-                        else append(" · Public holiday")
-                    },
+                    "${entry.holiday.date.format(timelineDateFmt)} · $kind",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -330,14 +331,18 @@ private fun TimelineCard(entry: TimelineEntry, accent: Color) {
                             .padding(horizontal = 8.dp, vertical = 2.dp),
                     ) {
                         Text(
-                            "${trip.leaveDaysNeeded} leave",
+                            stringResource(R.string.unit_leave_count, trip.leaveDaysNeeded),
                             style = MaterialTheme.typography.labelSmall,
                             color = accent,
                         )
                     }
                 }
                 Text(
-                    "${trip.startDate.format(timelineDateFmt)} – ${trip.endDate.format(timelineDateFmt)} · ${trip.tripDays} days",
+                    stringResource(
+                        R.string.timeline_trip_dates,
+                        "${trip.startDate.format(timelineDateFmt)} – ${trip.endDate.format(timelineDateFmt)}",
+                        trip.tripDays,
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -400,12 +405,12 @@ private fun TimelineEmpty(modifier: Modifier = Modifier) {
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            "Nothing on the timeline yet.",
+            stringResource(R.string.timeline_empty_title),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Text(
-            "Add a trip to see it here alongside holidays.",
+            stringResource(R.string.timeline_empty_subtitle),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
