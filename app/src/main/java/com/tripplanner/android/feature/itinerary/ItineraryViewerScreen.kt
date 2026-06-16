@@ -48,8 +48,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tripplanner.android.R
 import com.tripplanner.android.feature.optimizer.PlannedTrip
 import com.tripplanner.android.ui.components.TripCard
 import com.tripplanner.android.ui.theme.TripPlannerTheme
@@ -90,7 +92,7 @@ fun ItineraryViewerScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -115,7 +117,7 @@ fun ItineraryViewerScreen(
                     Tab(
                         selected = pagerState.currentPage == index,
                         onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                        text = { Text("Day ${day.dayNumber}") },
+                        text = { Text(stringResource(R.string.day_label, day.dayNumber)) },
                     )
                 }
             }
@@ -146,7 +148,7 @@ private fun OverviewCard(itinerary: Itinerary) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column {
-                Text("Estimated budget", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.itinerary_estimated_budget), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
                     itinerary.currency.format(itinerary.totalBudget),
                     style = MaterialTheme.typography.headlineSmall,
@@ -154,7 +156,7 @@ private fun OverviewCard(itinerary: Itinerary) {
                 )
             }
             Text(
-                "${itinerary.days.size} days",
+                stringResource(R.string.days_count, itinerary.days.size),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -237,7 +239,7 @@ private fun ActivityCard(
             ) {
                 Icon(
                     activity.category.icon,
-                    contentDescription = activity.category.label,
+                    contentDescription = stringResource(activity.category.labelRes),
                     tint = activity.category.onColor,
                     modifier = Modifier.size(22.dp),
                 )

@@ -52,8 +52,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tripplanner.android.R
 import com.tripplanner.android.feature.optimizer.PlannedTrip
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -147,7 +149,7 @@ fun ActivityStoriesScreen(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text("Day ${current.dayNumber}", style = androidx.compose.material3.MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
+                Text(stringResource(R.string.day_label, current.dayNumber), style = androidx.compose.material3.MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
                 Text("${indexWithinDay + 1} / ${dayEntries.size}", style = androidx.compose.material3.MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.8f))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
@@ -188,7 +190,7 @@ fun ActivityStoriesScreen(
                 .background(Color.Black.copy(alpha = 0.4f))
                 .pointerInput(Unit) { detectTapGestures { onClose() } },
         ) {
-            Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.action_close), tint = Color.White, modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -274,7 +276,7 @@ private fun StoryCard(
                     .padding(horizontal = 10.dp, vertical = 4.dp),
             ) {
                 Icon(category.icon, contentDescription = null, tint = category.onColor, modifier = Modifier.size(14.dp))
-                Text(category.label, style = androidx.compose.material3.MaterialTheme.typography.labelSmall, color = category.onColor)
+                Text(stringResource(category.labelRes), style = androidx.compose.material3.MaterialTheme.typography.labelSmall, color = category.onColor)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -292,7 +294,7 @@ private fun StoryCard(
             )
             if (isLong && !expanded) {
                 Text(
-                    "Read more",
+                    stringResource(R.string.story_read_more),
                     style = androidx.compose.material3.MaterialTheme.typography.labelMedium,
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
@@ -325,7 +327,7 @@ private fun StoryCard(
                     .padding(horizontal = 12.dp, vertical = 8.dp),
             ) {
                 Icon(Icons.Default.Place, contentDescription = null, tint = Color.White, modifier = Modifier.size(14.dp))
-                Text("View on Google Maps", style = androidx.compose.material3.MaterialTheme.typography.labelMedium, color = Color.White)
+                Text(stringResource(R.string.story_view_on_maps), style = androidx.compose.material3.MaterialTheme.typography.labelMedium, color = Color.White)
             }
         }
     }
