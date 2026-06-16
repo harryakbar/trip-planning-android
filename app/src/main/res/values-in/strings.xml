@@ -53,6 +53,9 @@
     <string name="calendar_tap_second_day">Ketuk hari kedua untuk menyesuaikan</string>
     <string name="action_clear">Hapus</string>
     <string name="action_create_trip">Buat perjalanan</string>
+    <string name="action_apply">Terapkan</string>
+    <string name="calendar_better_title">Lebih efisien di dekatnya</string>
+    <string name="calendar_better_summary">%1$s · hemat %2$d cuti</string>
 
     <!-- Timeline -->
     <string name="timeline_title">Linimasa %1$d</string>
