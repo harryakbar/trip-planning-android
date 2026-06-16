@@ -391,6 +391,7 @@ private fun SelectionBar(
         val scores = LeaveOptimization.calculateOptimizationScores(tripDays, state.year, state.holidays)
         LeaveOptimization.findBetterDateRange(start, scores)
     }
+    val overlap = state.overlappingTrip(start, end)
 
     Column(
         modifier = Modifier
@@ -401,6 +402,23 @@ private fun SelectionBar(
             .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        if (overlap != null) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(10.dp),
+            ) {
+                Text(
+                    stringResource(R.string.overlap_warning, overlap.destination),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
+        }
+
         if (better != null) {
             val suggestedEnd = better.date.plusDays((tripDays - 1).toLong())
             Row(

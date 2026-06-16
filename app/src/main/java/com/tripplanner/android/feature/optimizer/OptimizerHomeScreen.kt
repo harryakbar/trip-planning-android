@@ -175,6 +175,9 @@ fun OptimizerHomeScreen(
                                 StaggeredReveal(index = index) {
                                     SuggestionCard(
                                         suggestion = suggestion,
+                                        overlapName = state.overlappingTrip(
+                                            suggestion.startDate, suggestion.endDate,
+                                        )?.destination,
                                         onAdd = { pendingSuggestion = suggestion },
                                     )
                                 }
@@ -356,7 +359,7 @@ private fun LabeledControl(label: String, content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun SuggestionCard(suggestion: TripSuggestion, onAdd: () -> Unit) {
+private fun SuggestionCard(suggestion: TripSuggestion, overlapName: String?, onAdd: () -> Unit) {
     TripCard(modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -395,6 +398,14 @@ private fun SuggestionCard(suggestion: TripSuggestion, onAdd: () -> Unit) {
                     TripBadge(name, variant = TripBadgeVariant.Default)
                 }
             }
+        }
+
+        if (overlapName != null) {
+            Spacer(Modifier.height(12.dp))
+            TripBadge(
+                stringResource(R.string.overlap_warning, overlapName),
+                variant = TripBadgeVariant.Warning,
+            )
         }
 
         Spacer(Modifier.height(12.dp))

@@ -29,6 +29,7 @@
     <!-- Trips -->
     <string name="your_trips">Your trips</string>
     <string name="remove_trip">Remove trip</string>
+    <string name="overlap_warning">Overlaps %1$s</string>
 
     <!-- Name-trip dialog -->
     <string name="dialog_name_trip_title">Name your trip</string>

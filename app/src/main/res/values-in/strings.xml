@@ -27,6 +27,7 @@
     <!-- Trips -->
     <string name="your_trips">Perjalanan Anda</string>
     <string name="remove_trip">Hapus perjalanan</string>
+    <string name="overlap_warning">Bertabrakan dengan %1$s</string>
 
     <!-- Name-trip dialog -->
     <string name="dialog_name_trip_title">Beri nama perjalanan</string>
