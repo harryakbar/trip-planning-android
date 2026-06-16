@@ -5,6 +5,7 @@ package com.tripplanner.android
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedContent
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,21 +79,36 @@ private sealed class Screen {
 fun AppRoot() {
     var screen by remember { mutableStateOf<Screen>(Screen.Optimizer) }
     val sharedViewModel: OptimizerViewModel = viewModel()
-    val state by sharedViewModel.state.collectAsStateWithLifecycle()
-    val currency = if (state.country == CountryCode.ID) Currency.IDR else Currency.SGD
+
+    // Only `country` affects this composable. Reading the raw state here would recompose
+    // the whole nav host (and recreate every navigation lambda) on every trip/suggestion
+    // update, even mid-transition; deriving it isolates that churn.
+    val optimizerState = sharedViewModel.state.collectAsStateWithLifecycle()
+    val country by remember { derivedStateOf { optimizerState.value.country } }
+    val currency = if (country == CountryCode.ID) Currency.IDR else Currency.SGD
+
+    BackHandler(enabled = screen != Screen.Optimizer) {
+        screen = navigateBack(screen)
+    }
 
     SharedTransitionLayout {
         AnimatedContent(
             targetState = screen,
             transitionSpec = {
-                val isForward = targetState != Screen.Optimizer
-                val enter = fadeIn(tween(300)) + slideInHorizontally(tween(300)) {
-                    if (isForward) it else -it
+                if (initialState.inSharedElementChain() && targetState.inSharedElementChain()) {
+                    // Both ends already animate via sharedBounds/sharedElement; a competing
+                    // full-screen slide fights that bounds interpolation and looks stuttery.
+                    fadeIn(tween(220)) togetherWith fadeOut(tween(160))
+                } else {
+                    val isForward = targetState != Screen.Optimizer
+                    val enter = fadeIn(tween(300)) + slideInHorizontally(tween(300)) {
+                        if (isForward) it else -it
+                    }
+                    val exit = fadeOut(tween(300)) + slideOutHorizontally(tween(300)) {
+                        if (isForward) -it else it
+                    }
+                    enter togetherWith exit
                 }
-                val exit = fadeOut(tween(300)) + slideOutHorizontally(tween(300)) {
-                    if (isForward) -it else it
-                }
-                enter togetherWith exit
             },
             label = "screen_transition",
         ) { target ->
@@ -107,19 +124,19 @@ fun AppRoot() {
                 )
                 Screen.Calendar -> YearCalendarScreen(
                     viewModel = sharedViewModel,
-                    onBack = { screen = Screen.Optimizer },
+                    onBack = { screen = navigateBack(screen) },
                 )
                 Screen.Timeline -> TimelineScreen(
                     viewModel = sharedViewModel,
-                    onBack = { screen = Screen.Optimizer },
+                    onBack = { screen = navigateBack(screen) },
                     onTripClick = { trip -> screen = Screen.TripDetail(trip) },
                 )
-                Screen.Catalog -> ThemeCatalogScreen(onBack = { screen = Screen.Optimizer })
+                Screen.Catalog -> ThemeCatalogScreen(onBack = { screen = navigateBack(screen) })
                 is Screen.TripDetail -> TripDetailScreen(
                     trip = target.trip,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this@AnimatedContent,
-                    onBack = { screen = Screen.Optimizer },
+                    onBack = { screen = navigateBack(screen) },
                     onDelete = { sharedViewModel.removeTrip(target.trip.id) },
                     onSaveNotes = { notes -> sharedViewModel.updateTripNotes(target.trip.id, notes) },
                     onGenerateItinerary = { screen = Screen.Itinerary(target.trip) },
@@ -129,14 +146,14 @@ fun AppRoot() {
                     currency = currency,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this@AnimatedContent,
-                    onBack = { screen = Screen.TripDetail(target.trip) },
+                    onBack = { screen = navigateBack(screen) },
                     onActivityClick = { startIndex -> screen = Screen.Stories(target.trip, startIndex) },
                     onOpenMap = { screen = Screen.Map(target.trip) },
                 )
                 is Screen.Map -> TripMapScreen(
                     trip = target.trip,
                     currency = currency,
-                    onBack = { screen = Screen.Itinerary(target.trip) },
+                    onBack = { screen = navigateBack(screen) },
                 )
                 is Screen.Stories -> ActivityStoriesScreen(
                     trip = target.trip,
@@ -144,9 +161,26 @@ fun AppRoot() {
                     startIndex = target.startIndex,
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedContentScope = this@AnimatedContent,
-                    onClose = { screen = Screen.Itinerary(target.trip) },
+                    onClose = { screen = navigateBack(screen) },
                 )
             }
         }
     }
+}
+
+/** Mirrors each screen's own back action, so the system back gesture/button and the
+ *  in-app back arrow always agree on where "back" goes. */
+private fun navigateBack(current: Screen): Screen = when (current) {
+    Screen.Optimizer -> Screen.Optimizer
+    Screen.Calendar, Screen.Timeline, Screen.Catalog -> Screen.Optimizer
+    is Screen.TripDetail -> Screen.Optimizer
+    is Screen.Itinerary -> Screen.TripDetail(current.trip)
+    is Screen.Map -> Screen.Itinerary(current.trip)
+    is Screen.Stories -> Screen.Itinerary(current.trip)
+}
+
+/** Screens linked by a sharedBounds/sharedElement chain (trip card/title, activity card). */
+private fun Screen.inSharedElementChain(): Boolean = when (this) {
+    Screen.Optimizer, is Screen.TripDetail, is Screen.Itinerary, is Screen.Stories -> true
+    Screen.Calendar, Screen.Timeline, Screen.Catalog, is Screen.Map -> false
 }
