@@ -32,6 +32,7 @@ import com.tripplanner.android.feature.calendar.YearCalendarScreen
 import com.tripplanner.android.feature.itinerary.ActivityStoriesScreen
 import com.tripplanner.android.feature.itinerary.Currency
 import com.tripplanner.android.feature.itinerary.ItineraryViewerScreen
+import com.tripplanner.android.feature.itinerary.TripMapScreen
 import com.tripplanner.android.feature.optimizer.OptimizerHomeScreen
 import com.tripplanner.android.feature.optimizer.OptimizerViewModel
 import com.tripplanner.android.feature.optimizer.PlannedTrip
@@ -69,6 +70,7 @@ private sealed class Screen {
     data class TripDetail(val trip: PlannedTrip) : Screen()
     data class Itinerary(val trip: PlannedTrip) : Screen()
     data class Stories(val trip: PlannedTrip, val startIndex: Int) : Screen()
+    data class Map(val trip: PlannedTrip) : Screen()
 }
 
 @Composable
@@ -129,6 +131,12 @@ fun AppRoot() {
                     animatedContentScope = this@AnimatedContent,
                     onBack = { screen = Screen.TripDetail(target.trip) },
                     onActivityClick = { startIndex -> screen = Screen.Stories(target.trip, startIndex) },
+                    onOpenMap = { screen = Screen.Map(target.trip) },
+                )
+                is Screen.Map -> TripMapScreen(
+                    trip = target.trip,
+                    currency = currency,
+                    onBack = { screen = Screen.Itinerary(target.trip) },
                 )
                 is Screen.Stories -> ActivityStoriesScreen(
                     trip = target.trip,

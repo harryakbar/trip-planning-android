@@ -8,6 +8,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TripPlanner">
+
+        <!-- Google Maps API key, injected from local.properties / CI secret via
+             manifestPlaceholders. Empty by default so the project builds without it. -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

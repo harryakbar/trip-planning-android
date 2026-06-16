@@ -39,8 +39,12 @@ jobs:
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest --stacktrace
 
+      # MAPS_API_KEY is optional: if the repo secret is unset it builds with an
+      # empty key (map renders blank but the build still succeeds).
       - name: Build debug APK
         run: ./gradlew assembleDebug --stacktrace
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       # Downloadable from the workflow run's "Artifacts" section (kept 14 days).
       - name: Upload debug APK artifact

@@ -70,6 +70,12 @@
     <string name="days_count">%1$d hari</string>
     <string name="itinerary_estimated_budget">Perkiraan anggaran</string>
 
+    <!-- Map -->
+    <string name="map_title">Peta</string>
+    <string name="map_all_days">Semua hari</string>
+    <string name="map_no_locations">Tidak ada lokasi untuk ditampilkan</string>
+    <string name="action_open_map">Peta</string>
+
     <!-- Activity stories -->
     <string name="action_close">Tutup</string>
     <string name="story_read_more">Selengkapnya</string>

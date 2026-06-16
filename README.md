@@ -24,6 +24,29 @@ Planning and scope live in the issues, tracked under the epic
 
 The debug APK lands at `app/build/outputs/apk/debug/app-debug.apk`.
 
+## Google Maps API key (for the itinerary map)
+
+The interactive map (itinerary → **Map**) needs a Google Maps **Android** API
+key. The project builds fine without one — the map just renders blank — so the
+key is optional for everything else.
+
+- **Local builds:** add the key to `local.properties` (which is git-ignored):
+
+  ```properties
+  MAPS_API_KEY=YOUR_ANDROID_MAPS_API_KEY
+  ```
+
+  Alternatively pass `-PMAPS_API_KEY=…` or set the `MAPS_API_KEY` env var.
+
+- **CI / release APKs:** add a repository secret named **`MAPS_API_KEY`**
+  (Settings → Secrets and variables → Actions). The CI and Release workflows
+  pass it through to the build automatically.
+
+Enable the **Maps SDK for Android** for the key in Google Cloud, and restrict it
+to the app's package name (`com.tripplanner.android`) + signing certificate. The
+key is injected into the manifest via `manifestPlaceholders` and is never
+committed.
+
 ## CI/CD — getting a testable APK
 
 ### On every push / merge to `main`

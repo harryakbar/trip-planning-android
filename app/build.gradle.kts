@@ -1,8 +1,23 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
+}
+
+// Maps API key, resolved (in order) from local.properties, a Gradle property
+// (-PMAPS_API_KEY=…), or the MAPS_API_KEY env var. Never committed; defaults to
+// empty so the project still builds without it (the map renders blank).
+val mapsApiKey: String = run {
+    val props = Properties()
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) localFile.inputStream().use { props.load(it) }
+    props.getProperty("MAPS_API_KEY")
+        ?: (project.findProperty("MAPS_API_KEY") as String?)
+        ?: System.getenv("MAPS_API_KEY")
+        ?: ""
 }
 
 android {
@@ -16,6 +31,7 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -61,6 +77,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
     debugImplementation(libs.androidx.ui.tooling)
 
     testImplementation(libs.junit)

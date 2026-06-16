@@ -72,6 +72,12 @@
     <string name="days_count">%1$d days</string>
     <string name="itinerary_estimated_budget">Estimated budget</string>
 
+    <!-- Map -->
+    <string name="map_title">Map</string>
+    <string name="map_all_days">All days</string>
+    <string name="map_no_locations">No locations to display</string>
+    <string name="action_open_map">Map</string>
+
     <!-- Activity stories -->
     <string name="action_close">Close</string>
     <string name="story_read_more">Read more</string>
