@@ -37,4 +37,27 @@
     <!-- Language names -->
     <string name="language_english">English</string>
     <string name="language_indonesian">Bahasa Indonesia</string>
+
+    <!-- Common -->
+    <string name="action_back">Kembali</string>
+    <string name="unit_leave_count">%1$d cuti</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">Kalender %1$d</string>
+    <string name="legend">Legenda</string>
+    <string name="legend_public_holiday">Hari libur nasional</string>
+    <string name="legend_cuti_bersama">Cuti Bersama</string>
+    <string name="legend_weekend">Akhir pekan</string>
+    <string name="legend_suggested">Disarankan</string>
+    <string name="calendar_selection_summary">%1$d hari · %2$d cuti</string>
+    <string name="calendar_tap_second_day">Ketuk hari kedua untuk menyesuaikan</string>
+    <string name="action_clear">Hapus</string>
+    <string name="action_create_trip">Buat perjalanan</string>
+
+    <!-- Timeline -->
+    <string name="timeline_title">Linimasa %1$d</string>
+    <string name="timeline_today">Hari ini</string>
+    <string name="timeline_empty_title">Belum ada apa pun di linimasa.</string>
+    <string name="timeline_empty_subtitle">Tambahkan perjalanan untuk melihatnya bersama hari libur.</string>
+    <string name="timeline_trip_dates">%1$s · %2$d hari</string>
 </resources>

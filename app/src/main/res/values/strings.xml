@@ -39,4 +39,27 @@
     <!-- Language names -->
     <string name="language_english">English</string>
     <string name="language_indonesian">Bahasa Indonesia</string>
+
+    <!-- Common -->
+    <string name="action_back">Back</string>
+    <string name="unit_leave_count">%1$d leave</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">%1$d Calendar</string>
+    <string name="legend">Legend</string>
+    <string name="legend_public_holiday">Public holiday</string>
+    <string name="legend_cuti_bersama">Cuti Bersama</string>
+    <string name="legend_weekend">Weekend</string>
+    <string name="legend_suggested">Suggested</string>
+    <string name="calendar_selection_summary">%1$d days · %2$d leave</string>
+    <string name="calendar_tap_second_day">Tap a second day to adjust</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_create_trip">Create trip</string>
+
+    <!-- Timeline -->
+    <string name="timeline_title">%1$d Timeline</string>
+    <string name="timeline_today">Today</string>
+    <string name="timeline_empty_title">Nothing on the timeline yet.</string>
+    <string name="timeline_empty_subtitle">Add a trip to see it here alongside holidays.</string>
+    <string name="timeline_trip_dates">%1$s · %2$d days</string>
 </resources>

@@ -50,9 +50,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.tripplanner.android.R
 import com.tripplanner.android.core.holidays.CountryCode
 import com.tripplanner.android.core.holidays.ResolvedHoliday
 import com.tripplanner.android.feature.optimizer.OptimizerUiState
@@ -100,10 +102,10 @@ fun YearCalendarScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("${state.year} Calendar", style = MaterialTheme.typography.titleLarge) },
+                title = { Text(stringResource(R.string.calendar_title, state.year), style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -204,15 +206,15 @@ private fun Legend(state: OptimizerUiState) {
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f))
             .padding(12.dp),
     ) {
-        Text("Legend", style = MaterialTheme.typography.titleSmall)
+        Text(stringResource(R.string.legend), style = MaterialTheme.typography.titleSmall)
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            LegendItem(MaterialTheme.colorScheme.error.copy(alpha = 0.18f), "Public holiday")
-            LegendItem(Chart1.copy(alpha = 0.22f), "Cuti Bersama")
-            LegendItem(MaterialTheme.colorScheme.surfaceVariant, "Weekend")
-            LegendItem(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), "Suggested")
+            LegendItem(MaterialTheme.colorScheme.error.copy(alpha = 0.18f), stringResource(R.string.legend_public_holiday))
+            LegendItem(Chart1.copy(alpha = 0.22f), stringResource(R.string.legend_cuti_bersama))
+            LegendItem(MaterialTheme.colorScheme.surfaceVariant, stringResource(R.string.legend_weekend))
+            LegendItem(MaterialTheme.colorScheme.primary.copy(alpha = 0.14f), stringResource(R.string.legend_suggested))
             state.trips.forEachIndexed { i, trip ->
                 LegendItem(tripColor(i), trip.destination)
             }
@@ -391,18 +393,18 @@ private fun SelectionBar(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                "$tripDays days · $leave leave",
+                stringResource(R.string.calendar_selection_summary, tripDays, leave),
                 style = MaterialTheme.typography.titleSmall,
             )
             Text(
-                "Tap a second day to adjust",
+                stringResource(R.string.calendar_tap_second_day),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        TripTextButton(onClick = onClear) { Text("Clear") }
+        TripTextButton(onClick = onClear) { Text(stringResource(R.string.action_clear)) }
         Spacer(Modifier.size(8.dp))
-        TripButton(onClick = onCreate) { Text("Create trip") }
+        TripButton(onClick = onCreate) { Text(stringResource(R.string.action_create_trip)) }
     }
 }
 
