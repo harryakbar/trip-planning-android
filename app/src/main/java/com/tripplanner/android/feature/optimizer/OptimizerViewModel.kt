@@ -7,6 +7,7 @@ import com.tripplanner.android.core.holidays.CountryCode
 import com.tripplanner.android.core.holidays.HolidayRepository
 import com.tripplanner.android.core.holidays.ResolvedHoliday
 import com.tripplanner.android.core.optimizer.LeaveOptimization
+import com.tripplanner.android.core.util.datesOverlap
 import com.tripplanner.android.data.TripRepository
 import com.tripplanner.android.data.local.TripDatabase
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +35,10 @@ data class OptimizerUiState(
     val leaveUsed: Int get() = trips.sumOf { it.leaveDaysNeeded }
     val leaveRemaining: Int get() = annualLeave - leaveUsed
     val supportedCountries: List<CountryCode> get() = HolidayRepository.getSupportedCountries()
+
+    /** The first already-planned trip that overlaps [start]..[end], if any. */
+    fun overlappingTrip(start: LocalDate, end: LocalDate): PlannedTrip? =
+        trips.firstOrNull { datesOverlap(start, end, it.startDate, it.endDate) }
 }
 
 /**
