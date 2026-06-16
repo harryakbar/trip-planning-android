@@ -60,4 +60,34 @@
     <string name="timeline_empty_title">Belum ada apa pun di linimasa.</string>
     <string name="timeline_empty_subtitle">Tambahkan perjalanan untuk melihatnya bersama hari libur.</string>
     <string name="timeline_trip_dates">%1$s · %2$d hari</string>
+
+    <!-- Itinerary viewer -->
+    <string name="day_label">Hari %1$d</string>
+    <string name="days_count">%1$d hari</string>
+    <string name="itinerary_estimated_budget">Perkiraan anggaran</string>
+
+    <!-- Activity stories -->
+    <string name="action_close">Tutup</string>
+    <string name="story_read_more">Selengkapnya</string>
+    <string name="story_view_on_maps">Lihat di Google Maps</string>
+
+    <!-- Trip detail -->
+    <string name="detail_start">Mulai</string>
+    <string name="detail_end">Selesai</string>
+    <string name="detail_total_days">Total hari</string>
+    <string name="detail_leave_days">Hari cuti</string>
+    <string name="detail_efficiency">Efisiensi</string>
+    <string name="detail_notes">Catatan</string>
+    <string name="detail_notes_placeholder">Tambahkan catatan, daftar bawaan, ide…</string>
+    <string name="detail_itinerary">Rencana Perjalanan</string>
+    <string name="detail_itinerary_subtitle">Lihat rencana harian dengan aktivitas dan rincian anggaran.</string>
+    <string name="detail_view_itinerary">Lihat rencana</string>
+    <string name="detail_delete_trip">Hapus perjalanan</string>
+
+    <!-- Activity categories -->
+    <string name="category_food">Makanan &amp; Minuman</string>
+    <string name="category_sightseeing">Wisata</string>
+    <string name="category_transport">Transportasi</string>
+    <string name="category_accommodation">Akomodasi</string>
+    <string name="category_activity">Aktivitas</string>
 </resources>
