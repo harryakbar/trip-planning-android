@@ -32,6 +32,8 @@ jobs:
 
       - name: Build release APK
         run: ./gradlew assembleRelease --stacktrace
+        env:
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
 
       - name: Stage APK
         run: |
