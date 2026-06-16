@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -70,6 +71,7 @@ fun ItineraryViewerScreen(
     animatedContentScope: AnimatedContentScope,
     onBack: () -> Unit,
     onActivityClick: (Int) -> Unit = {},
+    onOpenMap: () -> Unit = {},
 ) {
     val itinerary = remember(trip.id, currency) { SampleItinerary.forTrip(trip, currency) }
     val pagerState = rememberPagerState(pageCount = { itinerary.days.size })
@@ -93,6 +95,11 @@ fun ItineraryViewerScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onOpenMap) {
+                        Icon(Icons.Default.Map, contentDescription = stringResource(R.string.action_open_map))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
