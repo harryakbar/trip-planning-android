@@ -22,8 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tripplanner.android.R
 import com.tripplanner.android.ui.components.TripCategory
 
 /**
@@ -56,7 +58,7 @@ fun BudgetByCategoryChart(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(category.label, style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(category.labelRes), style = MaterialTheme.typography.bodySmall)
                     Text(
                         currency.format(amount),
                         style = MaterialTheme.typography.bodySmall,

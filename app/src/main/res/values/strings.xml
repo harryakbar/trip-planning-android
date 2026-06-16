@@ -62,4 +62,34 @@
     <string name="timeline_empty_title">Nothing on the timeline yet.</string>
     <string name="timeline_empty_subtitle">Add a trip to see it here alongside holidays.</string>
     <string name="timeline_trip_dates">%1$s · %2$d days</string>
+
+    <!-- Itinerary viewer -->
+    <string name="day_label">Day %1$d</string>
+    <string name="days_count">%1$d days</string>
+    <string name="itinerary_estimated_budget">Estimated budget</string>
+
+    <!-- Activity stories -->
+    <string name="action_close">Close</string>
+    <string name="story_read_more">Read more</string>
+    <string name="story_view_on_maps">View on Google Maps</string>
+
+    <!-- Trip detail -->
+    <string name="detail_start">Start</string>
+    <string name="detail_end">End</string>
+    <string name="detail_total_days">Total days</string>
+    <string name="detail_leave_days">Leave days</string>
+    <string name="detail_efficiency">Efficiency</string>
+    <string name="detail_notes">Notes</string>
+    <string name="detail_notes_placeholder">Add notes, packing list, ideas…</string>
+    <string name="detail_itinerary">Itinerary</string>
+    <string name="detail_itinerary_subtitle">Preview a day-by-day plan with activities and a budget breakdown.</string>
+    <string name="detail_view_itinerary">View itinerary</string>
+    <string name="detail_delete_trip">Delete trip</string>
+
+    <!-- Activity categories -->
+    <string name="category_food">Food &amp; Drink</string>
+    <string name="category_sightseeing">Sightseeing</string>
+    <string name="category_transport">Transport</string>
+    <string name="category_accommodation">Accommodation</string>
+    <string name="category_activity">Activity</string>
 </resources>

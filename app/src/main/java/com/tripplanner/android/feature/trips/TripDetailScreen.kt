@@ -33,8 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.tripplanner.android.R
 import com.tripplanner.android.feature.optimizer.PlannedTrip
 import com.tripplanner.android.ui.components.TripButton
 import com.tripplanner.android.ui.components.TripCard
@@ -75,7 +77,7 @@ fun TripDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -112,20 +114,20 @@ fun TripDetailScreen(
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             DetailMetric(
-                                label = "Start",
+                                label = stringResource(R.string.detail_start),
                                 value = trip.startDate.format(detailDateFmt),
                             )
                             DetailMetric(
-                                label = "End",
+                                label = stringResource(R.string.detail_end),
                                 value = trip.endDate.format(detailDateFmt),
                                 alignment = Alignment.End,
                             )
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-                            DetailMetric(label = "Total days", value = "${trip.tripDays}")
-                            DetailMetric(label = "Leave days", value = "${trip.leaveDaysNeeded}")
+                            DetailMetric(label = stringResource(R.string.detail_total_days), value = "${trip.tripDays}")
+                            DetailMetric(label = stringResource(R.string.detail_leave_days), value = "${trip.leaveDaysNeeded}")
                             DetailMetric(
-                                label = "Efficiency",
+                                label = stringResource(R.string.detail_efficiency),
                                 value = String.format(
                                     Locale.ENGLISH,
                                     "%.1f×",
@@ -148,12 +150,12 @@ fun TripDetailScreen(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Text("Notes", style = MaterialTheme.typography.titleSmall)
+                        Text(stringResource(R.string.detail_notes), style = MaterialTheme.typography.titleSmall)
                     }
                     TripTextField(
                         value = notes,
                         onValueChange = { notes = it; onSaveNotes(it) },
-                        placeholder = "Add notes, packing list, ideas…",
+                        placeholder = stringResource(R.string.detail_notes_placeholder),
                         singleLine = false,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -162,9 +164,9 @@ fun TripDetailScreen(
 
             TripCard(modifier = Modifier.fillMaxWidth()) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Itinerary", style = MaterialTheme.typography.titleSmall)
+                    Text(stringResource(R.string.detail_itinerary), style = MaterialTheme.typography.titleSmall)
                     Text(
-                        "Preview a day-by-day plan with activities and a budget breakdown.",
+                        stringResource(R.string.detail_itinerary_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -172,7 +174,7 @@ fun TripDetailScreen(
                         onClick = onGenerateItinerary,
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("View itinerary")
+                        Text(stringResource(R.string.detail_view_itinerary))
                     }
                 }
             }
@@ -185,7 +187,7 @@ fun TripDetailScreen(
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
             ) {
-                Text("Delete trip")
+                Text(stringResource(R.string.detail_delete_trip))
             }
         }
     }
