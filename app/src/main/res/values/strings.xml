@@ -55,6 +55,9 @@
     <string name="calendar_tap_second_day">Tap a second day to adjust</string>
     <string name="action_clear">Clear</string>
     <string name="action_create_trip">Create trip</string>
+    <string name="action_apply">Apply</string>
+    <string name="calendar_better_title">More efficient nearby</string>
+    <string name="calendar_better_summary">%1$s · saves %2$d leave</string>
 
     <!-- Timeline -->
     <string name="timeline_title">%1$d Timeline</string>
