@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -9,7 +11,7 @@ plugins {
 // (-PMAPS_API_KEY=…), or the MAPS_API_KEY env var. Never committed; defaults to
 // empty so the project still builds without it (the map renders blank).
 val mapsApiKey: String = run {
-    val props = java.util.Properties()
+    val props = Properties()
     val localFile = rootProject.file("local.properties")
     if (localFile.exists()) localFile.inputStream().use { props.load(it) }
     props.getProperty("MAPS_API_KEY")
