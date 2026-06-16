@@ -67,8 +67,10 @@ import com.tripplanner.android.ui.components.TripTextButton
 import com.tripplanner.android.ui.theme.Chart1
 import com.tripplanner.android.ui.theme.LocalTripColors
 import com.tripplanner.android.ui.theme.TripPlannerTheme
+import com.tripplanner.android.core.optimizer.LeaveOptimization
 import java.time.LocalDate
 import java.time.Month
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -175,6 +177,7 @@ fun YearCalendarScreen(
                         end = end,
                         onClear = { selStart = null; selEnd = null },
                         onCreate = { showDestDialog = true },
+                        onApply = { newStart, newEnd -> selStart = newStart; selEnd = newEnd },
                     )
                 }
             }
@@ -366,6 +369,9 @@ private fun DayCell(
     }
 }
 
+private val selectionRangeFmt: DateTimeFormatter
+    get() = DateTimeFormatter.ofPattern("MMM d", Locale.getDefault())
+
 @Composable
 private fun SelectionBar(
     state: OptimizerUiState,
@@ -373,38 +379,79 @@ private fun SelectionBar(
     end: LocalDate,
     onClear: () -> Unit,
     onCreate: () -> Unit,
+    onApply: (LocalDate, LocalDate) -> Unit,
 ) {
     val tripDays = (java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1).toInt()
     val leave = remember(start, end, state.holidays, state.year) {
-        val prefix = com.tripplanner.android.core.optimizer.LeaveOptimization
-            .buildWorkingDayPrefix(state.year, state.holidays)
-        com.tripplanner.android.core.optimizer.LeaveOptimization
-            .calculateWorkingDaysNeeded(start, tripDays, prefix)
+        val prefix = LeaveOptimization.buildWorkingDayPrefix(state.year, state.holidays)
+        LeaveOptimization.calculateWorkingDaysNeeded(start, tripDays, prefix)
+    }
+    // A nearby, more-efficient window for the same trip length (if one exists).
+    val better = remember(start, end, state.holidays, state.year) {
+        val scores = LeaveOptimization.calculateOptimizationScores(tripDays, state.year, state.holidays)
+        LeaveOptimization.findBetterDateRange(start, scores)
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
             .clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colorScheme.surface)
             .padding(12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                stringResource(R.string.calendar_selection_summary, tripDays, leave),
-                style = MaterialTheme.typography.titleSmall,
-            )
-            Text(
-                stringResource(R.string.calendar_tap_second_day),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+        if (better != null) {
+            val suggestedEnd = better.date.plusDays((tripDays - 1).toLong())
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f))
+                    .padding(10.dp),
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.calendar_better_title),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Text(
+                        stringResource(
+                            R.string.calendar_better_summary,
+                            "${better.date.format(selectionRangeFmt)} – ${suggestedEnd.format(selectionRangeFmt)}",
+                            better.savedDays,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                TripTextButton(onClick = { onApply(better.date, suggestedEnd) }) {
+                    Text(stringResource(R.string.action_apply))
+                }
+            }
         }
-        TripTextButton(onClick = onClear) { Text(stringResource(R.string.action_clear)) }
-        Spacer(Modifier.size(8.dp))
-        TripButton(onClick = onCreate) { Text(stringResource(R.string.action_create_trip)) }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.calendar_selection_summary, tripDays, leave),
+                    style = MaterialTheme.typography.titleSmall,
+                )
+                Text(
+                    stringResource(R.string.calendar_tap_second_day),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            TripTextButton(onClick = onClear) { Text(stringResource(R.string.action_clear)) }
+            Spacer(Modifier.size(8.dp))
+            TripButton(onClick = onCreate) { Text(stringResource(R.string.action_create_trip)) }
+        }
     }
 }
 
